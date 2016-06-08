@@ -8,7 +8,9 @@ use std::default::Default;
 use rustbox::{Color, RustBox};
 use rustbox::Key;
 
+extern crate bestchat;
 
+use bestchat::message::*;
 
 fn main() {
     let mut stream = TcpStream::connect("192.168.1.40:24567").unwrap();
@@ -98,7 +100,12 @@ fn main() {
                         Key::Enter => {
                             line.push('\n');
 
-                            stream.write_all(&line.into_bytes()).unwrap();
+                            let message = ChatMessage {
+                                username: "collin".to_owned(),
+                                msg: line
+                            };
+
+                            stream.write_all(&message.into_bytes()).unwrap();
                             stream.flush().unwrap();
 
                             break;

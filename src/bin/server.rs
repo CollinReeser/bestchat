@@ -1,22 +1,27 @@
 use std::io::BufRead;
+use std::io::Read;
 use std::io::BufReader;
 use std::net::{TcpListener, TcpStream, SocketAddr};
 use std::thread;
 
+extern crate bestchat;
+
+use bestchat::message::*;
+
 fn client_connection(stream: TcpStream, addr: SocketAddr) {
     let mut reader = BufReader::new(stream);
 
-    let mut buf = String::new();
+    let mut buf = Vec::new();
 
     loop {
-        match reader.read_line(&mut buf) {
+        match reader.read_to_end(&mut buf) {
             Err (msg) => {
                 println!("{}: EOF: {}", addr, msg);
                 break;
             }
             Ok (0) => break,
             Ok (_) => {
-                print!("{}: {}", addr, buf);
+                print!("{}: {}", addr, (&buf).bytes_to_message());
             },
         }
 
