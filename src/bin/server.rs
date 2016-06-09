@@ -14,14 +14,14 @@ fn client_connection(stream: TcpStream, addr: SocketAddr) {
     let mut buf = Vec::new();
 
     loop {
-        match reader.read_to_end(&mut buf) {
+        match reader.read_until(1u8, &mut buf) {
             Err (msg) => {
                 println!("{}: EOF: {}", addr, msg);
                 break;
             }
             Ok (0) => break,
             Ok (_) => {
-                print!("{}: {}", addr, (&buf).bytes_to_message());
+                print!("{}: {}", addr, bytes_to_message(&buf[..buf.len()-1]));
             },
         }
 

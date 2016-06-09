@@ -12,6 +12,7 @@ impl ChatMessage {
         bytes.extend(&self.username.clone().into_bytes());
         bytes.push(0);
         bytes.extend(&self.msg.clone().into_bytes());
+        bytes.push(1);
 
         return bytes;
     }
@@ -23,19 +24,13 @@ impl fmt::Display for ChatMessage {
     }
 }
 
-trait ToChatMessage {
-    fn bytes_to_message(&self)-> ChatMessage;
-}
+pub fn bytes_to_message(bytes: &[u8]) -> ChatMessage {
+    let (username_bytes, msg_bytes) = bytes.split_at(
+        bytes.iter().position(|&x| x == 0).unwrap()
+    );
 
-impl<'a> ToChatMessage for &'a Vec<u8> {
-    fn bytes_to_message(&self) -> ChatMessage {
-        let (username_bytes, msg_bytes) = self.split_at(
-            self.iter().position(|&x| x == 0).unwrap()
-        );
-
-        return ChatMessage {
-            username: String::from_utf8(username_bytes.to_owned()).unwrap(),
-            msg: String::from_utf8(msg_bytes[1..].to_owned()).unwrap(),
-        };
-    }
+    return ChatMessage {
+        username: String::from_utf8(username_bytes.to_owned()).unwrap(),
+        msg: String::from_utf8(msg_bytes[1..].to_owned()).unwrap(),
+    };
 }
